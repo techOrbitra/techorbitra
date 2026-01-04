@@ -39,7 +39,7 @@ export default function BlogDetails() {
       </p>
       <img
         src={selectedBlog.imageUrl}
-        className="w-full max-h-[420px] object-cover rounded-2xl border border-white/10 shadow-lg"
+        className="w-full max-h-11/12 object-cover rounded-2xl border border-white/10 shadow-lg"
       />
       <div className="blog-content mt-10 max-w-3xl mx-auto text-gray-300">
         <div

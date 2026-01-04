@@ -10,3 +10,161 @@ body {
     font-family: var(--font-signika) !important;
     background-color: black;
 }
+
+/* Toast Animations */
+@keyframes toastSlideIn {
+    from {
+        transform: translateY(120px) scale(0.85);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes toastSlideOut {
+    from {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateY(120px) scale(0.85);
+        opacity: 0;
+    }
+}
+
+@keyframes progressShrink {
+    from {
+        width: 100%;
+    }
+
+    to {
+        width: 0%;
+    }
+}
+
+/* Base Toast Styling */
+.custom-toast {
+    animation: toastSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+    position: relative !important;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.custom-toast:hover {
+    transform: translateY(-4px) scale(1.02) !important;
+    box-shadow: 0 16px 48px rgba(2, 8, 20, 0.6) !important;
+    border-color: rgba(94, 234, 212, 0.5) !important;
+}
+
+/* Toast Types with Gradient Accents */
+.toast-success {
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.2), rgba(15, 23, 42, 0.9)) !important;
+    border-left: 4px solid #10b981 !important;
+}
+
+.toast-error {
+    background: linear-gradient(135deg, rgba(239, 68, 68, 0.2), rgba(15, 23, 42, 0.9)) !important;
+    border-left: 4px solid #ef4444 !important;
+}
+
+.toast-warning {
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.2), rgba(15, 23, 42, 0.9)) !important;
+    border-left: 4px solid #f59e0b !important;
+}
+
+.toast-info {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(15, 23, 42, 0.9)) !important;
+    border-left: 4px solid #3b82f6 !important;
+}
+
+/* Progress Bar */
+.vyrn-toast-progress-bar {
+    position: absolute !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    height: 4px !important;
+    background: linear-gradient(90deg, #5eead4, #0ea5e9, #8b5cf6) !important;
+    border-radius: 0 0 20px 20px !important;
+    animation: progressShrink 4s linear forwards !important;
+    box-shadow: 0 0 8px rgba(94, 234, 212, 0.5) !important;
+}
+
+/* Close Button */
+.vyrn-toast-close {
+    position: absolute !important;
+    top: 14px !important;
+    right: 14px !important;
+    background: rgba(148, 163, 184, 0.1) !important;
+    border: none !important;
+    color: #94a3b8 !important;
+    width: 28px !important;
+    height: 28px !important;
+    border-radius: 50% !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    font-size: 18px !important;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    backdrop-filter: blur(4px) !important;
+}
+
+.vyrn-toast-close:hover {
+    background: rgba(239, 68, 68, 0.2) !important;
+    color: #ef4444 !important;
+    transform: rotate(90deg) scale(1.1) !important;
+}
+
+/* Icon Styling */
+.vyrn-toast-icon {
+    font-size: 22px !important;
+    margin-right: 14px !important;
+    filter: drop-shadow(0 0 6px currentColor) !important;
+    animation: iconPulse 2s ease-in-out infinite !important;
+}
+
+@keyframes iconPulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+/* Toast Content Layout */
+.vyrn-toast-content {
+    display: flex !important;
+    align-items: center !important;
+    padding-right: 36px !important;
+    line-height: 1.5 !important;
+}
+
+/* Toast Container */
+.vyrn-toast-container {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    padding: 24px !important;
+}
+
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+    .custom-toast {
+        min-width: 300px !important;
+        max-width: 90vw !important;
+        font-size: 14px !important;
+        padding: 16px 20px !important;
+    }
+
+    .vyrn-toast-container {
+        padding: 16px !important;
+        gap: 12px !important;
+    }
+}

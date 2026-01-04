@@ -119,6 +119,22 @@ const ContactPage = () => {
                     />
                   </div>
                 </div>
+
+                {/* New Contact Number field */}
+                <div>
+                  <label className="block text-sm font-semibold text-gray-300 mb-2">
+                    Contact Number
+                  </label>
+                  
+                  <div className="flex gap-3">
+                    <input
+                      type="tel"
+                      required
+                      className="flex-1 px-4 py-3 border border-white/20 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 bg-white/5 placeholder-gray-400 text-white hover:bg-white/10"
+                      placeholder="Phone number"
+                    />
+                  </div>
+                </div>
                 <div>
                   <label className="block text-sm font-semibold text-gray-300 mb-2">
                     Subject
