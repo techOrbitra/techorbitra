@@ -1,10 +1,98 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { SocialIcon } from "react-social-icons";
 import { FaPhone, FaEnvelope, FaMapMarkerAlt } from "react-icons/fa";
+import useContactStore from "@/store/contactstore";
+import { useToast } from "vyrn";
 
 const ContactPage = () => {
+  const toast = useToast();
+
+  const { submitContact, loading, success, error, resetStatus } =
+    useContactStore();
+
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    contactNumber: "",
+    subject: "",
+    message: "",
+  });
+
+  const [errors, setErrors] = useState({
+    email: "",
+    contactNumber: "",
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    // 📧 Email validation
+    if (name === "email") {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      setErrors((prev) => ({
+        ...prev,
+        email: emailRegex.test(value)
+          ? ""
+          : "Please enter a valid email address",
+      }));
+    }
+
+    // 📱 Contact number validation (digits only, 10–15)
+    if (name === "contactNumber") {
+      const digitsOnly = value.replace(/\D/g, "");
+
+      setFormData((prev) => ({
+        ...prev,
+        contactNumber: digitsOnly,
+      }));
+
+      setErrors((prev) => ({
+        ...prev,
+        contactNumber:
+          digitsOnly.length < 10 || digitsOnly.length > 15
+            ? "Contact number must be 10–15 digits"
+            : "",
+      }));
+      return;
+    }
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await submitContact(formData);
+  };
+
+  /* ===============================
+     TOAST HANDLING
+  ================================ */
+  useEffect(() => {
+    if (success) {
+      toast.success("Message sent successfully 🚀");
+
+      setFormData({
+        fullName: "",
+        email: "",
+        contactNumber: "",
+        subject: "",
+        message: "",
+      });
+
+      resetStatus();
+    }
+
+    if (error) {
+      toast.error(error);
+      resetStatus();
+    }
+  }, [success, error, toast, resetStatus]);
+
   return (
     <div className="min-h-screen  my-26 px-4 sm:px-6 lg:px-8 text-white">
       <div className="max-w-7xl mx-auto">
@@ -89,79 +177,119 @@ const ContactPage = () => {
           </div>
 
           {/* Right Column - Contact Form */}
+          {/* Right Column - Contact Form */}
           <div>
             <div className="bg-white/5 backdrop-blur-xl rounded-3xl p-8 lg:p-12 shadow-2xl border border-white/10">
               <h3 className="text-3xl font-bold mb-8 text-cyan-400">
                 Send Message
               </h3>
-              <form className="space-y-6">
+
+              <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  {/* Full Name */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-300 mb-2">
                       Full Name
                     </label>
                     <input
                       type="text"
+                      name="fullName"
+                      value={formData.fullName}
+                      onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 border border-white/20 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 bg-white/5 placeholder-gray-400 text-white hover:bg-white/10"
                       placeholder="Your name"
+                      className="w-full px-4 py-3 border border-white/20 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 bg-white/5 placeholder-gray-400 text-white hover:bg-white/10"
                     />
                   </div>
+
+                  {/* Contact Number */}
                   <div>
                     <label className="block text-sm font-semibold text-gray-300 mb-2">
-                      Email
+                      Contact Number
                     </label>
                     <input
-                      type="email"
+                      type="tel"
+                      name="contactNumber"
+                      value={formData.contactNumber}
+                      onChange={handleChange}
                       required
-                      className="w-full px-4 py-3 border border-white/20 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 bg-white/5 placeholder-gray-400 text-white hover:bg-white/10"
-                      placeholder="your@email.com"
+                      placeholder="Phone number"
+                      className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 bg-white/5 placeholder-gray-400 text-white hover:bg-white/10 ${
+                        errors.contactNumber
+                          ? "border-red-500"
+                          : "border-white/20"
+                      }`}
                     />
+
+                    {errors.contactNumber && (
+                      <p className="mt-1 text-sm text-red-400">
+                        {errors.contactNumber}
+                      </p>
+                    )}
                   </div>
                 </div>
 
-                {/* New Contact Number field */}
+                {/* Email */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-300 mb-2">
-                    Contact Number
+                    Email
                   </label>
-                  
-                  <div className="flex gap-3">
-                    <input
-                      type="tel"
-                      required
-                      className="flex-1 px-4 py-3 border border-white/20 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 bg-white/5 placeholder-gray-400 text-white hover:bg-white/10"
-                      placeholder="Phone number"
-                    />
-                  </div>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
+                    placeholder="your@email.com"
+                    className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 bg-white/5 placeholder-gray-400 text-white hover:bg-white/10 ${
+                      errors.email ? "border-red-500" : "border-white/20"
+                    }`}
+                  />
+
+                  {errors.email && (
+                    <p className="mt-1 text-sm text-red-400">{errors.email}</p>
+                  )}
                 </div>
+
+                {/* Subject */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-300 mb-2">
                     Subject
                   </label>
                   <input
                     type="text"
+                    name="subject"
+                    value={formData.subject}
+                    onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-white/20 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 bg-white/5 placeholder-gray-400 text-white hover:bg-white/10"
                     placeholder="What's this about?"
+                    className="w-full px-4 py-3 border border-white/20 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 bg-white/5 placeholder-gray-400 text-white hover:bg-white/10"
                   />
                 </div>
+
+                {/* Message */}
                 <div>
                   <label className="block text-sm font-semibold text-gray-300 mb-2">
                     Message
                   </label>
                   <textarea
                     rows={6}
+                    name="message"
+                    value={formData.message}
+                    onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 border border-white/20 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 resize-vertical bg-white/5 placeholder-gray-400 text-white hover:bg-white/10"
                     placeholder="Tell us about your project..."
-                  ></textarea>
+                    className="w-full px-4 py-3 border border-white/20 rounded-xl focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 resize-vertical bg-white/5 placeholder-gray-400 text-white hover:bg-white/10"
+                  />
                 </div>
+
+                {/* Submit Button */}
                 <button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 text-black py-4 px-8 rounded-xl font-semibold text-lg shadow-lg hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2"
+                  disabled={loading || errors.email || errors.contactNumber}
+                  className="w-full bg-gradient-to-r from-cyan-400 to-blue-500 text-black py-4 px-8 rounded-xl font-semibold text-lg shadow-lg hover:scale-105 transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-50 disabled:hover:scale-100"
                 >
-                  Send Message
+                  {loading ? "Sending..." : "Send Message"}
                 </button>
               </form>
             </div>

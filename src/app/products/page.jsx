@@ -1,133 +1,105 @@
-// "use client";
-
-// import React from "react";
-// import { motion } from "framer-motion";
-
-// export default function Products() {
-//   return (
-//     <div className="min-h-screen bg-gradient-to-b from-black via-[#020617] to-black text-white mt-10 px-6 py-20 flex flex-col items-center relative overflow-hidden">
-//       {/* Floating Glowing Orbs */}
-//       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-//         <div className="absolute w-72 h-72 bg-cyan-500/30 rounded-full blur-[120px] top-10 left-10 animate-pulse" />
-//         <div className="absolute w-96 h-96 bg-purple-500/20 rounded-full blur-[140px] bottom-20 right-0 animate-ping" />
-//       </div>
-
-//       {/* TITLE */}
-//       <motion.h1
-//         initial={{ opacity: 0, scale: 0.7 }}
-//         animate={{ opacity: 1, scale: 1 }}
-//         transition={{ duration: 1.8, ease: "easeOut" }}
-//         className="text-5xl md:text-6xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-purple-500 drop-shadow-[0_0_15px_rgba(34,211,238,0.7)] mb-6 text-center"
-//       >
-//         Something Big Is Coming...
-//       </motion.h1>
-
-//       {/* SUBTEXT */}
-//       <motion.p
-//         initial={{ opacity: 0, y: 40 }}
-//         animate={{ opacity: 1, y: 0 }}
-//         transition={{ duration: 0.9 }}
-//         className="max-w-3xl text-center text-gray-300 leading-relaxed mb-14 text-lg"
-//       >
-//         We're crafting next-gen digital products designed to completely
-//         transform the way creators, founders, and developers build, launch, and
-//         grow.
-//         <br />
-//         <br />
-//         These tools are powerful. Intelligent. Beautiful. And we can’t wait to
-//         show them to you.
-//       </motion.p>
-
-//       {/* EMERGING MYSTERY BOX */}
-//       <motion.div
-//         initial={{ y: 60, opacity: 0 }}
-//         animate={{ y: 0, opacity: 1 }}
-//         transition={{ duration: 1, delay: 0.3 }}
-//         className="bg-gray-900/60 border border-gray-700 rounded-2xl p-10 mb-16 shadow-2xl w-full max-w-3xl backdrop-blur-lg"
-//       >
-//         <motion.h2
-//           animate={{ opacity: [0.4, 1, 0.4] }}
-//           transition={{ duration: 3, repeat: Infinity }}
-//           className="text-3xl font-semibold text-cyan-300 text-center mb-4"
-//         >
-//           ⚡ A New Digital Universe Is Loading…
-//         </motion.h2>
-
-//         <p className="text-gray-300 text-center">
-//           We are building something futuristic — tools powered by automation,
-//           creativity, and intelligence.
-//           <br />
-//           If you want early access, beta invites, or want to be part of this
-//           incredible journey…
-//         </p>
-
-//         <motion.p
-//           initial={{ opacity: 0 }}
-//           animate={{ opacity: 1 }}
-//           transition={{ repeat: Infinity, duration: 1.2, repeatType: "mirror" }}
-//           className="text-center mt-4 text-cyan-400 font-semibold"
-//         >
-//           Be the first to know.
-//         </motion.p>
-//       </motion.div>
-
-//       {/* CONTACT FORM */}
-//       <motion.div
-//         initial={{ scale: 0.8, opacity: 0 }}
-//         animate={{ scale: 1, opacity: 1 }}
-//         transition={{ duration: 0.8 }}
-//         className="w-full max-w-2xl bg-black/70 border border-gray-700 p-8 rounded-2xl shadow-lg backdrop-blur-xl"
-//       >
-//         <h2 className="text-3xl font-semibold text-center mb-6 text-cyan-300">
-//           Join Our Journey
-//         </h2>
-
-//         <form className="flex flex-col gap-5">
-//           {/* Each input animated */}
-//           {["Your Name", "Your Email", "Mobile Number", "Subject"].map(
-//             (placeholder, i) => (
-//               <motion.input
-//                 key={i}
-//                 initial={{ opacity: 0, x: -30 }}
-//                 animate={{ opacity: 1, x: 0 }}
-//                 transition={{ delay: i * 0.1 }}
-//                 type="text"
-//                 placeholder={placeholder}
-//                 className="w-full p-3 rounded-lg bg-black border border-gray-700 text-white focus:border-cyan-400 outline-none transition"
-//               />
-//             )
-//           )}
-
-//           {/* TEXTAREA */}
-//           <motion.textarea
-//             initial={{ opacity: 0, x: -30 }}
-//             animate={{ opacity: 1, x: 0 }}
-//             transition={{ delay: 0.5 }}
-//             placeholder="Write your message or description..."
-//             rows="5"
-//             className="w-full p-3 rounded-lg bg-black border border-gray-700 text-white focus:border-cyan-400 outline-none transition"
-//           ></motion.textarea>
-
-//           {/* BUTTON */}
-//           <motion.button
-//             whileHover={{ scale: 1.03 }}
-//             whileTap={{ scale: 0.97 }}
-//             className="w-full p-3 rounded-lg bg-gradient-to-r from-cyan-400 to-purple-500 font-semibold text-black shadow-lg"
-//           >
-//             Submit
-//           </motion.button>
-//         </form>
-//       </motion.div>
-//     </div>
-//   );
-// }
 "use client";
 
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
+import useContactStore from "@/store/contactstore";
+import { useToast } from "vyrn";
 
 export default function Products() {
+  const toast = useToast();
+
+  const { submitContact, loading, success, error, resetStatus } =
+    useContactStore();
+
   const [particles, setParticles] = useState([]);
+
+  const [formData, setFormData] = useState({
+    fullName: "",
+    email: "",
+    contactNumber: "",
+    subject: "",
+    message: "",
+  });
+
+  const [errors, setErrors] = useState({
+    email: "",
+    contactNumber: "",
+  });
+
+  // Generate particles (unchanged)
+  useEffect(() => {
+    const list = Array.from({ length: 25 }).map(() => ({
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      duration: 4 + Math.random() * 3,
+    }));
+    setParticles(list);
+  }, []);
+
+  /* ===============================
+     FORM HANDLERS
+  ================================ */
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    // Email validation
+    if (name === "email") {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      setErrors((prev) => ({
+        ...prev,
+        email: emailRegex.test(value)
+          ? ""
+          : "Please enter a valid email address",
+      }));
+    }
+
+    // Contact number validation
+    if (name === "contactNumber") {
+      const numberOnly = value.replace(/\D/g, "");
+      setFormData((prev) => ({ ...prev, contactNumber: numberOnly }));
+
+      setErrors((prev) => ({
+        ...prev,
+        contactNumber:
+          numberOnly.length < 10 || numberOnly.length > 15
+            ? "Contact number must be 10–15 digits"
+            : "",
+      }));
+
+      return;
+    }
+
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    await submitContact(formData);
+  };
+
+  /* ===============================
+     TOAST HANDLING
+  ================================ */
+  useEffect(() => {
+    if (success) {
+      toast.success("Thanks for joining our journey 🚀");
+
+      setFormData({
+        fullName: "",
+        email: "",
+        contactNumber: "",
+        subject: "",
+        message: "",
+      });
+
+      resetStatus();
+    }
+
+    if (error) {
+      toast.error(error);
+      resetStatus();
+    }
+  }, [success, error, toast, resetStatus]);
 
   // Generate particles ONLY on the client (avoids SSR mismatch)
   useEffect(() => {
@@ -239,44 +211,80 @@ export default function Products() {
         initial={{ scale: 0.85, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.8 }}
-        className="w-full max-w-2xl bg-black/70 border border-cyan-500/20 p-8 rounded-2xl shadow-[0_0_35px_rgba(34,211,238,0.15)] backdrop-blur-xl"
+        className="w-full max-w-2xl bg-black/70 border border-cyan-500/20 p-8 rounded-2xl backdrop-blur-xl"
       >
         <h2 className="text-3xl font-semibold text-center mb-6 text-cyan-300">
           Join Our Journey
         </h2>
 
-        <form className="flex flex-col gap-5">
-          {["Your Name", "Your Email", "Mobile Number", "Subject"].map(
-            (placeholder, i) => (
-              <motion.input
-                key={i}
-                initial={{ opacity: 0, x: -25 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.1 }}
-                type="text"
-                placeholder={placeholder}
-                className="w-full p-3 rounded-lg bg-black border border-gray-700 text-white focus:border-cyan-400 outline-none transition"
-              />
-            )
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <motion.input
+            name="fullName"
+            value={formData.fullName}
+            onChange={handleChange}
+            placeholder="Your Name"
+            required
+            className="w-full p-3 rounded-lg bg-black border border-gray-700 text-white focus:border-cyan-400 outline-none"
+          />
+
+          <motion.input
+            name="email"
+            type="email"
+            value={formData.email}
+            onChange={handleChange}
+            placeholder="Your Email"
+            required
+            className={`w-full p-3 rounded-lg bg-black border ${
+              errors.email ? "border-red-500" : "border-gray-700"
+            } text-white focus:border-cyan-400 outline-none`}
+          />
+
+          {errors.email && (
+            <p className="text-sm text-red-400">{errors.email}</p>
           )}
 
-          {/* TEXTAREA */}
+          <motion.input
+            name="contactNumber"
+            value={formData.contactNumber}
+            onChange={handleChange}
+            placeholder="Mobile Number"
+            required
+            className={`w-full p-3 rounded-lg bg-black border ${
+              errors.contactNumber ? "border-red-500" : "border-gray-700"
+            } text-white focus:border-cyan-400 outline-none`}
+          />
+
+          {errors.contactNumber && (
+            <p className="text-sm text-red-400">{errors.contactNumber}</p>
+          )}
+
+          <motion.input
+            name="subject"
+            value={formData.subject}
+            onChange={handleChange}
+            placeholder="Subject"
+            required
+            className="w-full p-3 rounded-lg bg-black border border-gray-700 text-white focus:border-cyan-400 outline-none"
+          />
+
           <motion.textarea
-            initial={{ opacity: 0, x: -25 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 }}
+            name="message"
+            value={formData.message}
+            onChange={handleChange}
             placeholder="Write your message or description..."
             rows="5"
-            className="w-full p-3 rounded-lg bg-black border border-gray-700 text-white focus:border-cyan-400 outline-none transition"
-          ></motion.textarea>
+            required
+            className="w-full p-3 rounded-lg bg-black border border-gray-700 text-white focus:border-cyan-400 outline-none"
+          />
 
-          {/* SUBMIT BUTTON */}
           <motion.button
+            type="submit"
+            disabled={loading || errors.email || errors.contactNumber}
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
-            className="w-full p-3 rounded-lg bg-gradient-to-r from-cyan-400 to-purple-500 font-semibold text-black shadow-lg"
+            className="w-full p-3 rounded-lg bg-gradient-to-r from-cyan-400 to-purple-500 font-semibold text-black disabled:opacity-50"
           >
-            Submit
+            {loading ? "Submitting..." : "Submit"}
           </motion.button>
         </form>
       </motion.div>
